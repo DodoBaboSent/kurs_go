@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KURS</title>
+    <link rel="stylesheet" href="/assets/app.css">
+    <script>
+        window.addEventListener("load", async () => {
+          if(navigator.serviceWorker){
+             try {
+              await navigator.serviceWorker.register("/assets/service_js.js")
+             } catch (e) {
+              console.log("Service worker is DEAD")
+             }
+          }
+      })
+      </script>
+</head>
+<body>
+    <div class="grid grid-cols-[2fr_600px] grid-rows-auto gap-4">
+        <div class="col-span-full flex flex-row mx-4 justify-between">
+          <h1 class="text-2xl">Hello World</h1>
+          <ul class="flex flex-row list-none">
+            <li><button hx-get="/templates/login.html" hx-swap="innerHTML" hx-target="#main" hx-trigger="click">Log In</button></li>
+          </ul>
+        </div>
+        <div class="flex flex-col gap-5 mx-4" id="main">
+            <output id="fileOutput" class="h-[200px] overflow-y-scroll border-dashed border-lime-500 border-2 rounded"></output>
+            <input type="file" id="fileInput">
+            <input type="text" name="search" id="fileSearch" class="border-2 rounded border-slate-500">
+            <div class="flex flex-col gap-5 h-[400px] overflow-y-scroll border-dashed border-lime-500 border-2 rounded px-3 py-3" id="searchOutput"></div>
+        </div>
+      </div>
+</body>
+<script src="/assets/app.js"></script>
+</html>

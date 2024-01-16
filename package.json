@@ -1,0 +1,17 @@
+{
+  "name": "kurs_go",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "start npx tailwindcss -i ./src/assets/app.css -o ./build/app.css --watch && start go run main.go && start npx watchify -p esmify src/assets/app.js -o build/app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "tailwindcss": "^3.4.1",
+    "watchify": "^4.0.0"
+  }
+}
