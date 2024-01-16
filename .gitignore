@@ -19,3 +19,7 @@
 
 # Go workspace file
 go.work
+node_modules
+WASM_src\go.sum
+go.sum
+package-lock.json

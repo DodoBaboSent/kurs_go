@@ -1,0 +1,8 @@
+{
+    "name": "Kurs",
+    "short_name": "Kurs",
+    "theme_color": "#000000",
+    "background_color": "#000000",
+    "display": "browser",
+    "start_url": "."
+  }
