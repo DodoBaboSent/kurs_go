@@ -561,10 +561,6 @@ video {
   display: grid;
 }
 
-.h-\[500px\] {
-  height: 500px;
-}
-
 .h-\[200px\] {
   height: 200px;
 }
@@ -573,8 +569,8 @@ video {
   height: 400px;
 }
 
-.w-\[100\%\] {
-  width: 100%;
+.w-\[15\%\] {
+  width: 15%;
 }
 
 .w-full {
@@ -583,22 +579,6 @@ video {
 
 .list-none {
   list-style-type: none;
-}
-
-.auto-cols-\[minmax\(0\2c _2fr\)\] {
-  grid-auto-columns: minmax(0, 2fr);
-}
-
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.grid-cols-\[2fr_300px\] {
-  grid-template-columns: 2fr 300px;
-}
-
-.grid-cols-\[2fr_400px\] {
-  grid-template-columns: 2fr 400px;
 }
 
 .grid-cols-\[2fr_600px\] {
@@ -617,24 +597,12 @@ video {
   justify-content: space-between;
 }
 
-.justify-stretch {
-  justify-content: stretch;
-}
-
 .gap-4 {
   gap: 1rem;
 }
 
-.gap-2 {
-  gap: 0.5rem;
-}
-
 .gap-5 {
   gap: 1.25rem;
-}
-
-.justify-self-end {
-  justify-self: end;
 }
 
 .overflow-y-scroll {
@@ -645,12 +613,12 @@ video {
   border-radius: 0.25rem;
 }
 
-.border-2 {
-  border-width: 2px;
-}
-
 .border {
   border-width: 1px;
+}
+
+.border-2 {
+  border-width: 2px;
 }
 
 .border-dashed {
@@ -672,9 +640,29 @@ video {
   border-color: rgb(30 41 59 / var(--tw-border-opacity));
 }
 
+.border-slate-300 {
+  --tw-border-opacity: 1;
+  border-color: rgb(203 213 225 / var(--tw-border-opacity));
+}
+
+.bg-slate-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(100 116 139 / var(--tw-bg-opacity));
+}
+
 .bg-slate-800 {
   --tw-bg-opacity: 1;
   background-color: rgb(30 41 59 / var(--tw-bg-opacity));
+}
+
+.bg-slate-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(203 213 225 / var(--tw-bg-opacity));
+}
+
+.bg-slate-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(148 163 184 / var(--tw-bg-opacity));
 }
 
 .px-3 {
@@ -682,23 +670,24 @@ video {
   padding-right: 0.75rem;
 }
 
+.px-\[1rem\] {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .py-3 {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
 }
 
-.text-center {
-  text-align: center;
+.py-\[1rem\] {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
-}
-
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
 }
 
 .text-white {

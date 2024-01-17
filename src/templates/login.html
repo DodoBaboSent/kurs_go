@@ -1,5 +1,8 @@
 <form class="flex flex-col gap-4 w-full" action="/login" method="post">
     <label for="username">Username:<input type="text" name="username" id="username" class="w-full border rounded border-slate-800"></label>
     <label for="password">Password:<input type="text" name="password" id="password" class="w-full border rounded border-slate-800"></label>
-    <input type="submit" value="Log in" class="bg-slate-800 text-white rounded">
+    <div class="flex flex-row gap-5">
+        <input type="submit" value="Log in" class="bg-slate-800 text-white rounded w-[15%]">
+        <a href="#" hx-target="#main" hx-swap="innerHTML" hx-get="/templates/reg.html" hx-trigger="click">Register</a>
+    </div>
 </form>
