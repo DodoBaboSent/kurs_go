@@ -2,8 +2,11 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
+	"text/template"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -24,18 +27,27 @@ type User struct {
 	Role     string `gorm:"default:user"`
 }
 
+type News struct {
+	gorm.Model
+	Name string
+	Text string
+}
+
 var db *gorm.DB
 var err error
 
 func main() {
 	r := gin.Default()
+	r.SetFuncMap(template.FuncMap{
+		"formatAsDate": formatAsDate,
+	})
 	r.StaticFile("/assets/app.css", "build/app.css")
 	r.StaticFile("/assets/app.js", "build/app.js")
 	r.StaticFile("/assets/main.wasm", "build/vendor/main.wasm")
-	r.StaticFile("/assets/service_js.js", "build/service_js.js")
+	r.StaticFile("/service_js.js", "build/service_js.js")
 	r.Static("/static", "build/static")
 	r.Static("/templates", "src/templates")
-	r.LoadHTMLFiles("src/templates/index.html", "src/templates/admin.html")
+	r.LoadHTMLFiles("src/templates/index.html", "src/templates/admin.html", "src/templates/new.html")
 
 	db, err = gorm.Open(sqlite.Open("test.sqlite"), &gorm.Config{})
 	if err != nil {
@@ -49,6 +61,14 @@ func main() {
 		}
 	}
 
+	if err = db.AutoMigrate(&News{}); err == nil && db.Migrator().HasTable(&News{}) {
+		if err := db.First(&News{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			db.Delete(&News{Name: "Initial Stuff"})
+			db.Create(&News{Name: "Initial Stuff", Text: "Lorem Ipsum stuff stuff stuff stuff stuff"})
+			db.Create(&News{Name: "Initial Stuff 2", Text: "Lorem Ipsum stuff stuff stuff stuff stuff 2"})
+		}
+	}
+
 	r.Use(sessions.Sessions("mysession", cookie.NewStore(secret)))
 
 	r.GET("/", func(ctx *gin.Context) {
@@ -58,6 +78,26 @@ func main() {
 	r.POST("/login", login)
 	r.GET("/logout", logout)
 	r.POST("/reg", reg)
+	r.GET("/news", func(ctx *gin.Context) {
+		var newsScan []News
+		var newsGot []*News
+		db.Find(&newsGot).Scan(&newsScan)
+		ctx.HTML(http.StatusOK, "new.html", gin.H{
+			"News": newsScan,
+		})
+	})
+	r.POST("/new-post", func(ctx *gin.Context) {
+		name := ctx.PostForm("name")
+		text := ctx.PostForm("text")
+
+		post := News{Name: name, Text: text}
+		result := db.Create(&post)
+		if result.Error != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to reg"})
+			return
+		}
+		ctx.Redirect(302, "/")
+	})
 
 	private := r.Group("/admin")
 	private.Use(AuthRequired)
@@ -75,6 +115,11 @@ func main() {
 	}
 
 	r.Run(":8080")
+}
+
+func formatAsDate(t time.Time) string {
+	year, month, day := t.Date()
+	return fmt.Sprintf("%02d/%02d/%d", day, month, year)
 }
 
 func AuthRequired(c *gin.Context) {

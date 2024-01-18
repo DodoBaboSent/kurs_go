@@ -1,9 +1,18 @@
-<h1>Template {{.role | print}}</h1>
+<div class="flex flex-col gap-5">
+    <div class="text-3xl">{{.role | print}} settings</div>
 
-{{if eq .role "admin" }}
-    <h1>Admin panel</h1>
-{{end}}
-
-<div class="w-full flex flex-col gap-5 border border-dashed border-slate-500 px-[1rem] py-[1rem] rounded">
-    <button class="w-full bg-slate-400 text-white rounded" hx-get="/logout" hx-swap="innerHTML" hx-target="#main" hx-trigger="click">Log Out</button>
+    <div class="w-full flex flex-col gap-5 border border-dashed border-slate-500 px-[1rem] py-[1rem] rounded">
+        <button class="w-full bg-slate-400 text-white rounded" hx-get="/logout" hx-swap="innerHTML" hx-target="#main" hx-trigger="click">Log Out</button>
+    </div>
+    
+    
+    {{if eq .role "admin" }}
+        <div class="text-3xl text-red-500">Admin panel</div>
+        <form action="/new-post" method="post" class="flex flex-col gap-5 w-full">
+            <label for="name" class="flex flex-col gap-3 w-full">Name: <input class="border border-slate-500 w-full p-2 rounded" type="text" name="name" id="name" placeholder="Lorem Ipsum"></label>
+            <label for="text" class="flex flex-col gap-3 w-full">Text: <textarea class="border border-slate-500 w-full p-2 rounded" name="text" id="text" placeholder="Lorem Ipsum"></textarea></label>
+            <button type="submit" class="bg-slate-400 rounded text-white w-[15%]">Post</button>
+        </form>
+    {{end}}
+ 
 </div>

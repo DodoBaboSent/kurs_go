@@ -1,4 +1,4 @@
-const dynamicCacheName = "d-app-v1"
+const staticCacheName = "s-app-v1"
 
 const assetUrls = [
     '/',
@@ -7,12 +7,13 @@ const assetUrls = [
     '/assets/app.css',
     '/static/offline.html',
     '/static/manifest.json',
+    '/news',
 ]
 
 self.addEventListener('install', event => {
     console.log("installed")
     event.waitUntil(
-        caches.open(dynamicCacheName).then(cache => cache.addAll(assetUrls))
+        caches.open(staticCacheName).then(cache => cache.addAll(assetUrls))
     )
 })
 
@@ -21,7 +22,7 @@ self.addEventListener('activate', async event => {
     const cacheNames = await caches.keys()
     await Promise.all(
         cacheNames
-        .filter(name => name !== dynamicCacheName)
+        .filter(name => name !== staticCacheName)
         .map(name => caches.delete(name))
     )
     return self.clients.claim();
@@ -30,16 +31,19 @@ self.addEventListener('activate', async event => {
 self.addEventListener('fetch', async event => {
     const {request} = event
     
-    console.log("Fetch " + request.url)
-
-    console.log("Going online")
-    event.respondWith(networkFirst(request))
-
+    const url = new URL(request.url)
+    if (url.pathname === "/news") {
+        event.respondWith(networkFirst(request))
+    } else if (url.origin !== location.origin) {
+        event.respondWith(networkFirst(request))
+    } else {
+        event.respondWith(cacheFirst(request))
+    }
 })
 
 
 async function networkFirst(request){
-    const cache = await caches.open(dynamicCacheName)
+    const cache = await caches.open(staticCacheName)
     try {
         const response = await fetch(request)
         await cache.put(request, response.clone())
@@ -49,4 +53,14 @@ async function networkFirst(request){
         return cached ?? await cache.match("/static/offline.html")
     }
 
+}
+
+async function cacheFirst(request){
+    const cache = await caches.open(staticCacheName)
+    try{
+        const cached = await cache.match(request)
+        return cached ?? await fetch(request)
+    } catch (e){
+        return await cache.match("/static/offline.html")
+    }
 }
