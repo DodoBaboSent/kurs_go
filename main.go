@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const userkey = "user"
@@ -22,15 +24,23 @@ var secret = []byte("secret")
 
 type User struct {
 	gorm.Model
-	Email    string
+	Email    string `gorm:"unique"`
 	Password string
 	Role     string `gorm:"default:user"`
 }
 
 type News struct {
+	gorm.Model  `gorm:"embedded"`
+	Name        string
+	Text        string
+	UsrComments []Comments
+}
+type Comments struct {
 	gorm.Model
-	Name string
-	Text string
+	UserID uint
+	NewsID uint
+	User   User
+	Text   string
 }
 
 var db *gorm.DB
@@ -40,6 +50,7 @@ func main() {
 	r := gin.Default()
 	r.SetFuncMap(template.FuncMap{
 		"formatAsDate": formatAsDate,
+		"getUsr":       getUsr,
 	})
 	r.StaticFile("/assets/app.css", "build/app.css")
 	r.StaticFile("/assets/app.js", "build/app.js")
@@ -47,7 +58,7 @@ func main() {
 	r.StaticFile("/service_js.js", "build/service_js.js")
 	r.Static("/static", "build/static")
 	r.Static("/templates", "src/templates")
-	r.LoadHTMLFiles("src/templates/index.html", "src/templates/admin.html", "src/templates/new.html")
+	r.LoadHTMLFiles("src/templates/index.html", "src/templates/admin.html", "src/templates/new.html", "src/templates/article.html")
 
 	db, err = gorm.Open(sqlite.Open("test.sqlite"), &gorm.Config{})
 	if err != nil {
@@ -63,8 +74,14 @@ func main() {
 
 	if err = db.AutoMigrate(&News{}); err == nil && db.Migrator().HasTable(&News{}) {
 		if err := db.First(&News{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			comment := []Comments{Comments{
+				User: User{Email: "test@example.com", Password: "test"},
+				Text: "Test test",
+			}}
+			db.AutoMigrate(&Comments{})
+			db.Create(&comment).Association("User")
 			db.Delete(&News{Name: "Initial Stuff"})
-			db.Create(&News{Name: "Initial Stuff", Text: "Lorem Ipsum stuff stuff stuff stuff stuff"})
+			db.Create(&News{Name: "Initial Stuff", Text: "Lorem Ipsum stuff stuff stuff stuff stuff", UsrComments: comment}).Association("Comments")
 			db.Create(&News{Name: "Initial Stuff 2", Text: "Lorem Ipsum stuff stuff stuff stuff stuff 2"})
 		}
 	}
@@ -98,6 +115,29 @@ func main() {
 		}
 		ctx.Redirect(302, "/")
 	})
+	r.GET("/new/:id", func(ctx *gin.Context) {
+		id_q := ctx.Param("id")
+		id, _ := strconv.Atoi(id_q)
+		NewsArticle := News{}
+		db.Model(&News{}).Preload(clause.Associations).Find(&NewsArticle, "id = ?", id)
+		session := sessions.Default(ctx)
+		user := session.Get(userkey)
+		ctx.HTML(http.StatusOK, "article.html", gin.H{
+			"Article": NewsArticle,
+			"CurUser": user,
+		})
+	})
+	r.POST("/post-comment", func(ctx *gin.Context) {
+		a_id := ctx.PostForm("id")
+		a_id_uint, _ := strconv.Atoi(a_id)
+		poster_usr := ctx.PostForm("name")
+		text_comm := ctx.PostForm("text")
+		var usr User
+		db.Find(&usr, "email = ?", poster_usr)
+		new_comm := Comments{UserID: usr.ID, NewsID: uint(a_id_uint), Text: text_comm}
+		db.Create(&new_comm)
+		ctx.Redirect(302, fmt.Sprintf("/new/%s", a_id))
+	})
 
 	private := r.Group("/admin")
 	private.Use(AuthRequired)
@@ -114,12 +154,18 @@ func main() {
 		})
 	}
 
-	r.Run(":8080")
+	r.Run("127.0.0.1:8080")
 }
 
 func formatAsDate(t time.Time) string {
 	year, month, day := t.Date()
 	return fmt.Sprintf("%02d/%02d/%d", day, month, year)
+}
+
+func getUsr(id uint) string {
+	var usr User
+	db.Find(&usr, "id = ?", id)
+	return usr.Email
 }
 
 func AuthRequired(c *gin.Context) {

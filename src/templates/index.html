@@ -19,7 +19,7 @@
   </head>
   <body>
     <div
-      class="grid grid-cols-[2fr_600px] grid-rows-[9%_90%_11%] h-full gap-4"
+      class="grid grid-cols-[2fr_600px] grid-rows-[80px_max(100vh,100%)_100px] h-full gap-4"
     >
       <div class="col-span-full flex flex-row justify-between p-4 items-center">
         <h1 class="text-4xl px-[5rem] font-bold">Hello World</h1>
@@ -44,7 +44,7 @@
           </li>
         </ul>
       </div>
-      <main class="flex flex-col gap-5 mx-[2rem]" id="main">
+      <main class="flex flex-col gap-5 mx-[2rem] py-10" id="main">
         <div class="border rounded border-slate-600 p-3 flex flex-col gap-5">
           <output
             id="fileOutput"
@@ -66,7 +66,7 @@
           ></div>
         </div>
       </main>
-      <aside class="flex flex-col gap-5 divide-y divide-solid px-4">
+      <aside class="flex flex-col gap-5 divide-y divide-solid px-4 py-10">
         <span class="text-xl">News</span>
         <div class="gap-5" hx-swap="innerHTML" hx-trigger="intersect" hx-get="/news"></div>
       </aside>

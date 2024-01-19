@@ -3,5 +3,6 @@
     <div class="text-2xl font-bold">{{.Name | print}}</div>
     <div class="text-sm text-zinc-400">{{ .CreatedAt | formatAsDate | print}}</div>
     <div class="text-justify">{{.Text | print}}</div>
+    <button hx-target="#main" hx-swap="innerHTML" hx-trigger="click" hx-get="/new/{{ .ID | print }}">View</button>
 </div>
 {{end}}
