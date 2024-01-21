@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,6 +14,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	gomail "gopkg.in/mail.v2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -19,14 +22,21 @@ import (
 
 const userkey = "user"
 const rolekey = "role"
+const api_pass = "CaZx4NVdtkKzreLq3Cmn"
+const sender = "rodion.lugovov.75@bk.ru"
 
 var secret = []byte("secret")
+
+type Mail struct {
+	Link string
+}
 
 type User struct {
 	gorm.Model
 	Email    string `gorm:"unique"`
 	Password string
 	Role     string `gorm:"default:user"`
+	Active   bool   `gorm:"default:false"`
 }
 
 type News struct {
@@ -68,14 +78,14 @@ func main() {
 	if err = db.AutoMigrate(&User{}); err == nil && db.Migrator().HasTable(&User{}) {
 		if err := db.First(&User{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			db.Delete(&User{Email: "admin@example.com"})
-			db.Create(&User{Email: "admin@example.com", Password: "admin", Role: "admin"})
+			db.Create(&User{Email: "admin@example.com", Password: "admin", Role: "admin", Active: true})
 		}
 	}
 
 	if err = db.AutoMigrate(&News{}); err == nil && db.Migrator().HasTable(&News{}) {
 		if err := db.First(&News{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			comment := []Comments{Comments{
-				User: User{Email: "test@example.com", Password: "test"},
+				User: User{Email: "test@example.com", Password: "test", Active: true},
 				Text: "Test test",
 			}}
 			db.AutoMigrate(&Comments{})
@@ -138,6 +148,13 @@ func main() {
 		db.Create(&new_comm)
 		ctx.Redirect(302, fmt.Sprintf("/new/%s", a_id))
 	})
+	r.GET("/activate/:id", func(ctx *gin.Context) {
+		id_s := ctx.Param("id")
+		id, _ := strconv.Atoi(id_s)
+
+		db.Model(&User{}).Where("id = ?", uint(id)).Update("active", true)
+		ctx.Redirect(302, "/")
+	})
 
 	private := r.Group("/admin")
 	private.Use(AuthRequired)
@@ -147,9 +164,13 @@ func main() {
 		private.GET("/panel", func(ctx *gin.Context) {
 			session := sessions.Default(ctx)
 			role_s := session.Get(rolekey)
+			user_s := session.Get(userkey)
+			var user User
+			db.Find(&user, "email = ?", user_s)
 			println(role_s)
 			ctx.HTML(http.StatusOK, "admin.html", gin.H{
-				"role": role_s,
+				"role":   role_s,
+				"active": user.Active,
 			})
 		})
 	}
@@ -260,6 +281,35 @@ func reg(c *gin.Context) {
 
 	var selected User
 	db.First(&user).Scan(&selected)
+
+	t := template.New("mail.html")
+
+	var err error
+	t, err = t.ParseFiles("src/templates/mail.html")
+	if err != nil {
+		log.Println(err)
+	}
+
+	link := Mail{
+		Link: fmt.Sprintf("http://link to the resource/activate/%d", selected.ID),
+	}
+	var tpl bytes.Buffer
+	if err := t.Execute(&tpl, link); err != nil {
+		log.Println(err)
+	}
+
+	result_mail := tpl.String()
+	m := gomail.NewMessage()
+	m.SetHeader("From", sender)
+	m.SetHeader("To", username)
+	m.SetHeader("Subject", "Registration finish")
+	m.SetBody("text/html", result_mail)
+
+	d := gomail.NewDialer("smtp.mail.ru", 465, sender, api_pass)
+	if err := d.DialAndSend(m); err != nil {
+		println(err)
+	}
+
 	session.Set(userkey, username)
 	session.Set(rolekey, selected.Role)
 	if err := session.Save(); err != nil {

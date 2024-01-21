@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>KURS</title>
     <link rel="stylesheet" href="/assets/app.css" />
+    <link rel="manifest" href="/static/manifest.json">
     <script>
       window.addEventListener("load", async () => {
         if (navigator.serviceWorker) {
@@ -22,7 +23,10 @@
       class="grid grid-cols-[2fr_600px] grid-rows-[80px_max(100vh,100%)_100px] h-full gap-4"
     >
       <div class="col-span-full flex flex-row justify-between p-4 items-center">
-        <h1 class="text-4xl px-[5rem] font-bold">Hello World</h1>
+        <div class="flex flex-row gap-3 px-[5rem] items-center">
+          <img src="/static/loopa.png" alt="logo" class="w-[50px]">
+          <h1 class="text-4xl font-bold">GoSearch</h1>
+        </div>
         <ul class="flex flex-row list-none gap-10 text-lg px-10">
           <li></li>
             <a
@@ -42,6 +46,17 @@
               Admin
             </button>
           </li>
+          <li>
+            <button
+              hx-get="/templates/about.html"
+              hx-swap="innerHTML"
+              hx-target="#main"
+              hx-trigger="click"
+              class="rounded-full bg-cyan-500 text-white py-1 px-6 hover:bg-cyan-700 active:bg-zinc-500 active:text-white"
+            >
+              About
+            </button>
+          </li>
         </ul>
       </div>
       <main class="flex flex-col gap-5 mx-[2rem] py-10" id="main">
@@ -58,7 +73,7 @@
               name="search"
               id="fileSearch"
               class="border-2 rounded border-slate-500 w-full"
-          /></label>
+          /> <button id="searchBtn" class="bg-slate-500 px-5 text-white rounded">Search</button></label>
           <div
             class="flex flex-col gap-5 overflow-y-scroll border-dashed border-lime-500 rounded p-3 transition-transform"
             id="searchOutput"

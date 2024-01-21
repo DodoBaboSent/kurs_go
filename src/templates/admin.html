@@ -1,6 +1,10 @@
 <div class="flex flex-col gap-5">
     <div class="text-3xl">{{.role | print}} settings</div>
 
+    {{if not .active}}
+        <div class="bg-amber-500 p-2 w-full rounded text-white font-bold">Your account is not activated. Check your email</div>
+    {{end}}
+
     <div class="w-full flex flex-col gap-5 border border-dashed border-slate-500 px-[1rem] py-[1rem] rounded">
         <button class="w-full bg-slate-400 text-white rounded" hx-get="/logout" hx-swap="innerHTML" hx-target="#main" hx-trigger="click">Log Out</button>
     </div>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mail</title>
+    <style>
+        .flex{
+            display: flex;
+        }
+        .flex-col{
+            flex-direction: column;
+        }
+        .gap-4{
+            gap: 1rem;
+        }
+        .border-2{
+            border-width: 2px;
+        }
+        .border-dashed{
+            border-style: dashed;
+        }
+        .border-red-500{
+            border-color: #ef4444;
+        }
+        .w-full{
+            width: 100%;
+        }
+        .text-3xl{
+            font-size: 1.875rem/* 30px */;
+            line-height: 2.25rem/* 36px */;
+        }
+        .text-red-500{
+            color: #ef4444;
+        }
+        .text-center{
+            text-align: center;
+        }
+        .rounded {
+            border-radius: 0.25rem/* 4px */;
+        }
+        .text-zinc-600 {
+            color: #52525b;
+        }
+        .p-3 {
+            padding: 0.75rem/* 12px */;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex flex-col gap-4 border-2 border-dashed border-red-500 w-full rounded p-3">
+        <div class="text-3xl text-red-500 text-center w-full">Activation link</div>
+        <div class="text-zinc-600">{{ .Link }}</div>
+    </div>
+</body>
+</html>

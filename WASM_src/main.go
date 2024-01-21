@@ -26,19 +26,41 @@ func max(a, b int) int {
 func fileSearch() js.Func {
 	return js.FuncOf(func(this js.Value, args []js.Value) any {
 
-		println(args[0].String())
-
 		needle := strings.ToLower(args[0].String())
 
-		found := fuzzy.Find(needle, strings.Split(out, " "))
+		found := fuzzy.Find(needle, strings.Split(strings.ToLower(out), " "))
 
 		htmlTemplate := ""
 
+		ind := 0
+		cropped_out := out
 		for i := 0; i < len(found); i++ {
-			ind := strings.Index(out, found[i])
+			ind = strings.Index(strings.ToLower(cropped_out), found[i])
 			ind_clamped := max(0, ind-125)
-			upp_ind_clamped := min(len(out), ind+125)
-			htmlTemplate += "<div class=\"px-3 border-dashed border-amber-500 border-2 rounded\">..." + out[ind_clamped:ind] + "<strong>" + out[ind:ind+len(found[i])] + "</strong>" + out[ind+len(found[i]):upp_ind_clamped] + "...</div>\n"
+			upp_ind_clamped := 0
+			word_len := 0
+			if i == 0 {
+				upp_ind_clamped = min(len(out), ind+125)
+				word_len = min(ind+len(found[i]), len(out))
+
+				if ind != -1 {
+					htmlTemplate += "<div class=\"px-3 border-dashed border-amber-500 border-2 rounded\">..." + out[ind_clamped:ind] + "<strong>" + out[ind:word_len] + "</strong>" + out[word_len:upp_ind_clamped] + "...</div>\n"
+				}
+
+				cropped_out = out[ind+len(found[i]):]
+			} else {
+
+				word_len = min(ind+len(found[i]), len(cropped_out))
+				upp_ind_clamped = min(len(cropped_out), ind+125)
+
+				word := cropped_out[ind:word_len]
+				if ind != -1 {
+					htmlTemplate += "<div class=\"px-3 border-dashed border-amber-500 border-2 rounded\">..." + cropped_out[ind_clamped:ind] + "<strong>" + word + "</strong>" + cropped_out[word_len:upp_ind_clamped] + "...</div>\n"
+				}
+
+				cropped_out = cropped_out[ind+len(found[i]):]
+			}
+
 		}
 
 		document := js.Global().Get("document")

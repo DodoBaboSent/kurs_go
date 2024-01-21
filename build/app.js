@@ -575,6 +575,10 @@ WebAssembly.instantiateStreaming(fetch("/assets/main.wasm"), goWasm.importObject
     const text = document.getElementById("fileSearch").value;
     fileSearch(text);
   });
+  document.getElementById("searchBtn").addEventListener("click", function () {
+    const text = document.getElementById("fileSearch").value;
+    fileSearch(text);
+  });
 });
 
 },{"../../build/vendor/htmx.min.js":1,"../../build/vendor/wasm_exec.js":2}]},{},[3]);

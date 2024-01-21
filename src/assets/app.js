@@ -20,4 +20,9 @@ WebAssembly.instantiateStreaming(fetch("/assets/main.wasm"), goWasm.importObject
 
         fileSearch(text)
     })
+    document.getElementById("searchBtn").addEventListener("click", function(){
+        const text = document.getElementById("fileSearch").value
+
+        fileSearch(text)
+    })
 })

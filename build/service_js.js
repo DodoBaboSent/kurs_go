@@ -8,6 +8,7 @@ const assetUrls = [
     '/static/offline.html',
     '/static/manifest.json',
     '/news',
+    '/static/loopa.png'
 ]
 
 self.addEventListener('install', event => {
