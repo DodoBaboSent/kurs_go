@@ -132,9 +132,12 @@ func main() {
 		db.Model(&News{}).Preload(clause.Associations).Find(&NewsArticle, "id = ?", id)
 		session := sessions.Default(ctx)
 		user := session.Get(userkey)
+		var user_db User
+		db.Find(&user_db, "email = ? ", user)
 		ctx.HTML(http.StatusOK, "article.html", gin.H{
 			"Article": NewsArticle,
 			"CurUser": user,
+			"Active":  user_db.Active,
 		})
 	})
 	r.POST("/post-comment", func(ctx *gin.Context) {

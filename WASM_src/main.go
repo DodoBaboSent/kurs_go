@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"strings"
 	"syscall/js"
 
@@ -48,17 +49,22 @@ func fileSearch() js.Func {
 				}
 
 				cropped_out = out[ind+len(found[i]):]
+
 			} else {
 
-				word_len = min(ind+len(found[i]), len(cropped_out))
+				cropped_out = cropped_out[ind+len(found[i]):]
+
 				upp_ind_clamped = min(len(cropped_out), ind+125)
 
-				word := cropped_out[ind:word_len]
+				word_or_pos := int(math.Abs(float64(len(out)-len(cropped_out)))) - len(found[i])
+				word_or_pos_clamped := max(0, word_or_pos-125)
+
+				word := out[word_or_pos : word_or_pos+len(found[i])]
+
 				if ind != -1 {
-					htmlTemplate += "<div class=\"px-3 border-dashed border-amber-500 border-2 rounded\">..." + cropped_out[ind_clamped:ind] + "<strong>" + word + "</strong>" + cropped_out[word_len:upp_ind_clamped] + "...</div>\n"
+					htmlTemplate += "<div class=\"px-3 border-dashed border-amber-500 border-2 rounded\">..." + out[word_or_pos_clamped:word_or_pos] + "<strong>" + word + "</strong>" + cropped_out[:upp_ind_clamped] + "...</div>\n"
 				}
 
-				cropped_out = cropped_out[ind+len(found[i]):]
 			}
 
 		}
@@ -70,6 +76,14 @@ func fileSearch() js.Func {
 		return nil
 	})
 
+}
+
+func getText() js.Func {
+	return js.FuncOf(func(this js.Value, args []js.Value) any {
+		out = args[0].String()
+		println(out)
+		return nil
+	})
 }
 
 func SendFile() {
@@ -101,5 +115,6 @@ func main() {
 	ch := make(chan struct{}, 0)
 	js.Global().Set("fileSearch", fileSearch())
 	SendFile()
+	js.Global().Set("getText", getText())
 	<-ch
 }

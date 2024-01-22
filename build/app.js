@@ -559,6 +559,10 @@
 },{}],3:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.manualSearch = manualSearch;
 require("../../build/vendor/wasm_exec.js");
 require("../../build/vendor/htmx.min.js");
 const goWasm = new Go();
@@ -580,5 +584,16 @@ WebAssembly.instantiateStreaming(fetch("/assets/main.wasm"), goWasm.importObject
     fileSearch(text);
   });
 });
+if (document.readyState !== "complete") {
+  window.manualSearch = manualSearch;
+}
+function manualSearch() {
+  const text = document.getElementById(`searchArt`).value;
+  const article = document.getElementById(`text_art`).innerText;
+  console.log(article);
+  console.log(text);
+  getText(article);
+  fileSearch(text);
+}
 
 },{"../../build/vendor/htmx.min.js":1,"../../build/vendor/wasm_exec.js":2}]},{},[3]);

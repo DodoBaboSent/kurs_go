@@ -1,8 +1,24 @@
 <div class="flex flex-col w-full gap-5">
     <div class="text-3xl font-bold">{{.Article.Name | print}}</div>
     <div class="text-sm text-zinc-400">{{ .Article.CreatedAt | formatAsDate | print}}</div>
-    <div class="text-justify">{{.Article.Text | print}}</div>
+    <div class="text-justify" id="text_art">{{.Article.Text | print}}</div>
+    <div class="border rounded p-3 flex flex-col gap-3">
+        <div class="flex flex-row gap-3">
+            <label for="searchArt">Search in Article:</label>
+            <input type="text" name="searchArt" id="searchArt" class="w-full border px-3" onchange="manualSearch()">
+            <button class="bg-slate-500 text-white rounded px-3" onclick="manualSearch()">Search</button>
+        </div>
+        <div
+        class="flex flex-col gap-5 overflow-y-scroll border-dashed border-lime-500 rounded p-3"
+        id="searchOutput"
+        style="height: 0px; border-width: 0px"
+      ></div>
+    </div>
     <div class="border rounded p-3 flex flex-col gap-5">
+        {{ if ne .CurUser nil }}
+        {{ if ne .Active true }}
+        <div class="flex flex-col p-3 bg-amber-500 text-white font-bold rounded">Your account not activated!</div>
+        {{ else }}
         <form hx-post="/post-comment" hx-target="#main" hx-swap="innerHTML" class="border rounded p-3 flex gap-3 flex-col">
             <input type="hidden" name="id" value="{{ .Article.ID | print }}">
             <label for="name" class="font-bold">{{ .CurUser | print }} <input type="hidden" name="name" value="{{ .CurUser | print }}"></label>
@@ -10,6 +26,8 @@
             <textarea name="text" id="text" placeholder="Lorem Ipsum" class="border p-3"></textarea>
             <button type="submit" class="w-[20%] bg-slate-500 rounded text-white">Post</button>
         </form>
+        {{ end }}
+        {{ end }}
         {{ range .Article.UsrComments }}
             <div class="font-bold">{{ .UserID | getUsr | print }}</div>
             <div>{{ .Text | print }}</div>

@@ -26,3 +26,17 @@ WebAssembly.instantiateStreaming(fetch("/assets/main.wasm"), goWasm.importObject
         fileSearch(text)
     })
 })
+
+if (document.readyState !== "complete") {
+    window.manualSearch = manualSearch
+}
+
+export function manualSearch(){
+    const text = document.getElementById(`searchArt`).value
+    const article = document.getElementById(`text_art`).innerText
+
+    console.log(article)
+    console.log(text)
+    getText(article)
+    fileSearch(text)
+}
