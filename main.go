@@ -16,7 +16,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	gomail "gopkg.in/mail.v2"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -82,7 +82,7 @@ func main() {
 	r.Static("/templates", "src/templates")
 	r.LoadHTMLFiles("src/templates/index.html", "src/templates/admin.html", "src/templates/new.html", "src/templates/article.html", "src/templates/login.html")
 
-	db, err = gorm.Open(mysql.Open(os.Getenv("DATABASE_URL")), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open("kurs.sqlite"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}

@@ -14,11 +14,7 @@ services:
       dockerfile: Dockerfile
     command: sh -c "go run main.go"
     environment:
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 
-      MYSQL_DATABASE: kurs
-      MYSQL_HOST: mysql_db
-      MYSQL_PORT: "3306"
+      DATABASE_URL: root@tcp(mysql_db:3306)/kurs?charset=utf8mb4&parseTime=True&loc=Local
       DOCKER: prod
     ports:
       - 8080:8080
