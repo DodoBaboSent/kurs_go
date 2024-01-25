@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"text/template"
@@ -15,9 +16,11 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	gomail "gopkg.in/mail.v2"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	dotenv "github.com/joho/godotenv"
 )
 
 const userkey = "user"
@@ -57,6 +60,15 @@ var db *gorm.DB
 var err error
 
 func main() {
+
+	if os.Getenv("DOCKER") != "prod" {
+		println(os.Getenv("DOCKER"))
+		err = dotenv.Load()
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	r := gin.Default()
 	r.SetFuncMap(template.FuncMap{
 		"formatAsDate": formatAsDate,
@@ -68,9 +80,9 @@ func main() {
 	r.StaticFile("/service_js.js", "build/service_js.js")
 	r.Static("/static", "build/static")
 	r.Static("/templates", "src/templates")
-	r.LoadHTMLFiles("src/templates/index.html", "src/templates/admin.html", "src/templates/new.html", "src/templates/article.html")
+	r.LoadHTMLFiles("src/templates/index.html", "src/templates/admin.html", "src/templates/new.html", "src/templates/article.html", "src/templates/login.html")
 
-	db, err = gorm.Open(sqlite.Open("test.sqlite"), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(os.Getenv("DATABASE_URL")), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -178,7 +190,7 @@ func main() {
 		})
 	}
 
-	r.Run("127.0.0.1:8080")
+	r.Run(":8080")
 }
 
 func formatAsDate(t time.Time) string {
@@ -217,17 +229,16 @@ func login(c *gin.Context) {
 	}
 
 	// Check for username and password match, usually from a database
-	var user = User{Email: username}
 	var selected User
-	db.First(&user).Scan(&selected)
+	db.Find(&selected, "email = ?", username)
 	println(selected.Email)
 	println(selected.Password)
 	if selected.Email != username {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed"})
+		c.Redirect(302, "/templates/err.html")
 		return
 	}
 	if selected.Password != password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed"})
+		c.Redirect(302, "/templates/err.html")
 		return
 	}
 

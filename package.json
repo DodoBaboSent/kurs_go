@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "start npx tailwindcss -i ./src/assets/app.css -o ./build/app.css --watch && start go run main.go && start npx watchify -p esmify src/assets/app.js -o build/app.js -v"
+    "dev": "start npx tailwindcss -i ./src/assets/app.css -o ./build/app.css --watch && start go run main.go && start npx watchify -p esmify src/assets/app.js -o build/app.js -v",
+    "build": "npx tailwindcss -i ./src/assets/app.css -o ./build/app.css && npx browserify -p esmify src/assets/app.js -o build/app.js"
   },
   "author": "",
   "license": "ISC",

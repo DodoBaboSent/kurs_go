@@ -4,7 +4,12 @@ go 1.21
 
 require github.com/lithammer/fuzzysearch v1.1.8
 
-require gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+require (
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+	gorm.io/driver/mysql v1.5.2 // indirect
+)
 
 require (
 	github.com/bytedance/sonic v1.9.1 // indirect
