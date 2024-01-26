@@ -20,10 +20,10 @@
   </head>
   <body>
     <div
-      class="grid grid-cols-[2fr_600px] grid-rows-[80px_max(100vh,100%)_100px] h-full gap-4"
+      class="grid lg:grid-cols-[2fr_600px] sm:grid-cols-[1fr] lg:grid-rows-[80px_max(100vh,100%)_100px] sm:grid-rows-[100px_1fr_min(1fr, 25%)_100px] h-full gap-4"
     >
       <div class="col-span-full flex flex-row justify-between p-4 items-center">
-        <div class="flex flex-row gap-3 px-[5rem] items-center">
+        <div class="flex flex-row gap-3 lg:px-[5rem] sm:px-[1rem] items-center">
           <img src="/static/loopa.png" alt="logo" class="w-[50px]">
           <h1 class="text-4xl font-bold">GoSearch</h1>
         </div>
@@ -90,7 +90,7 @@
         <div class="gap-5" hx-swap="innerHTML" hx-trigger="intersect" hx-get="/news"></div>
       </aside>
       <footer
-        class="grid grid-cols-[1fr_1fr_1fr] grid-rows-[1fr] gap-4 bg-cyan-800 row-start-3 col-span-full p-4"
+        class="grid grid-cols-[1fr_1fr_1fr] grid-rows-[1fr] gap-4 bg-cyan-800 lg:row-start-3 sm:row-start-4 col-span-full p-4"
       >
         <div class="text-white col-start-2 flex items-end justify-center">
           2024 (c) Наугольнов Артём ИС-41
