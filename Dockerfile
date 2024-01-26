@@ -10,6 +10,8 @@ COPY . .
 # Expose port 3000 for Node.js application
 EXPOSE 8080
 
+
+RUN go get
 RUN go build main.go
 
 # Run npm run dev when the container launches
