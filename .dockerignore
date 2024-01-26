@@ -1,3 +1,4 @@
 node_modules
 WASM_src
 .env
+go.sum
